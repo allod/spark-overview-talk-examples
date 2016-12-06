@@ -1,0 +1,21 @@
+//cd to spark directory
+//start spark-shell with spark-xml package
+./bin/spark-shell --packages com.databricks:spark-xml_2.11:0.4.1
+
+//load xml data to DataFrame
+val xml = spark.read.format("com.databricks.spark.xml").option("rowTag", "item").load("/tmp/data/emails.xml")
+
+//print xml schema
+xml.printSchema
+
+//register DataFrame as table
+xml.createOrReplaceTempView("xml")
+
+//describe table
+sql("describe xml").show
+
+//try simple select query
+sql("select distinct location from xml").show
+
+//complex query for reading data from complex columns
+sql("select explode(mail) as element from xml").select("element.from").distinct.orderBy("from").show()
